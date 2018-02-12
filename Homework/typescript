@@ -1,0 +1,51 @@
+Script started on Sun 11 Feb 2018 07:43:50 PM EST
+]0;atdean@mosquito: ~/COS350/Homeworkatdean@mosquito:~/COS350/Homework$ myexpand -t 3 < tabtest.txt
+tab test for prog1 in COS350
+   0
+1  1
+22 2
+333   3
+4444  4
+55555 5
+666666   6
+7777777  7
+88888888 8
+1  1  1  1  1
+22 22 22 22 22
+333   333   333   333   333
+
+ #####  ####### ####### ######               # ####### ######
+#     # #     # #     # #     #              # #     # #     #
+#       #     # #     # #     #              # #     # #     #
+#  #### #     # #     # #     #              # #     # ######
+#     # #     # #     # #     #        #     # #     # #     #
+#     # #     # #     # #     #        #     # #     # #     #
+ #####  ####### ####### ######          #####  ####### ######
+]0;atdean@mosquito: ~/COS350/Homeworkatdean@mosquito:~/COS350/Homework$ myexpand < tabtest.txt
+tab test for prog1 in COS350
+        0
+1       1
+22      2
+333     3
+4444    4
+55555   5
+666666  6
+7777777 7
+88888888        8
+1       1       1       1       1
+22      22      22      22      22
+333     333     333     333     333
+
+ #####  ####### ####### ######                                  # ####### ######
+#               # #       # #            # #            #                                       # #       # #            #
+#                 #       # #            # #            #                                       # #       # #            #
+#       #### #    # #            # #            #                                       # #       # ######
+#               # #       # #            # #            #                       #               # #       # #            #
+#               # #       # #            # #            #                       #               # #       # #            #
+ #####  ####### ####### ######                   #####  ####### ######
+]0;atdean@mosquito: ~/COS350/Homeworkatdean@mosquito:~/COS350/Homework$ myexpand 3 < tabtest.txt
+Usage: myexpand -t [tab size]
+]0;atdean@mosquito: ~/COS350/Homeworkatdean@mosquito:~/COS350/Homework$ exit
+exit
+
+Script done on Sun 11 Feb 2018 07:44:24 PM EST
