@@ -79,23 +79,24 @@ int main (int argc, char *argv[])
 		{
 			// print in little endian order
 			write(outputFd, &fileSize, 1);
-			printf("%x\n", fileSize);
 			fileSize = fileSize >> 8;		
 		}
 
-			readResult = read(inputFd, inputBuf, 1);	// get one character from input file to start
-			if (readResult < 0) 
-			{
-				fprintf(stderr, "Error reading file\n");
-				exit(1);
-			}
-			else if (readResult < 1)
-			{
-				notEOF = 0;
-			}
+		readResult = read(inputFd, inputBuf, 1);	// get one character from input file to start (ensures file isn't empty)
+		if (readResult < 0) 
+		{
+			fprintf(stderr, "Error reading file\n");
+			exit(1);
+		}
+		else if (readResult < 1)
+		{
+			fprintf(stderr, "Cannot compress empty file\n");
+			exit(1);
+		}
+
+		// compress rest of file
 		while (notEOF)
 		{
-			printf("%c\n", *inputBuf);
 			for (numBits = 0; numBits < 7; numBits++)
 			{
 				buffer |= (0x01 & (*inputBuf >> numBits)) << bufSize;
@@ -115,7 +116,8 @@ int main (int argc, char *argv[])
 				fprintf(stderr, "File cannot be compressed.");
 				exit(1);
 			}
-			
+		
+			// get next character	
 			readResult = read(inputFd, inputBuf, 1);
 			if (readResult < 0)
 			{
@@ -127,7 +129,7 @@ int main (int argc, char *argv[])
 				notEOF = 0;
 			}
 		}
-		buffer = buffer << (8 - bufSize);
+//		buffer = buffer << (8 - bufSize);
 		write(outputFd, &buffer, 1);
 			
 	}
