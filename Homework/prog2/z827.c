@@ -1,9 +1,10 @@
 /*****************************************************
  *
  *	Author: Alexander Dean
+ *  
+ *	Code written for COS 350, University of Southern Maine, Spring 2018
  *
- *
- *
+ *  Compresses or decompresses a text file
  *
  *****************************************************/
 
@@ -65,7 +66,7 @@ int main (int argc, char *argv[])
 	{
 		unsigned int buffer = 0; // bit buffer
 		unsigned int numBits = 0; // number of bits in current byte
-		unsigned char *inputBuf; //input file for System read function
+		unsigned char inputBuf; //input file for System read function
 		unsigned int bufSize = 0; // size of input buffer (to know when to dump to output file)
 		unsigned int i;	// iterator for for loops, etc
 		unsigned int readResult; // checks return value on read()
@@ -82,7 +83,7 @@ int main (int argc, char *argv[])
 			fileSize = fileSize >> 8;		
 		}
 
-		readResult = read(inputFd, inputBuf, 1);	// get one character from input file to start (ensures file isn't empty)
+		readResult = read(inputFd, &inputBuf, 1);	// get one character from input file to start (ensures file isn't empty)
 		if (readResult < 0) 
 		{
 			fprintf(stderr, "Error reading file\n");
@@ -97,9 +98,10 @@ int main (int argc, char *argv[])
 		// compress rest of file
 		while (notEOF)
 		{
+//			printf("%c\n", *inputBuf);
 			for (numBits = 0; numBits < 7; numBits++)
 			{
-				buffer |= (0x01 & (*inputBuf >> numBits)) << bufSize;
+				buffer |= (0x01 & (inputBuf >> numBits)) << bufSize;
 				bufSize++;
 				if (bufSize >= 8)
 				{
@@ -111,14 +113,14 @@ int main (int argc, char *argv[])
 			}
 			
 			// check last bit
-			if (!((0x01 << numBits) | *inputBuf))	// 1 in MSB, file cannot be compressed
+			if (!((0x01 << numBits) | inputBuf))	// 1 in MSB, file cannot be compressed
 			{
 				fprintf(stderr, "File cannot be compressed.");
 				exit(1);
 			}
 		
 			// get next character	
-			readResult = read(inputFd, inputBuf, 1);
+			readResult = read(inputFd, &inputBuf, 1);
 			if (readResult < 0)
 			{
 				fprintf(stderr, "Error in file reading\n");
@@ -129,15 +131,78 @@ int main (int argc, char *argv[])
 				notEOF = 0;
 			}
 		}
-//		buffer = buffer << (8 - bufSize);
 		write(outputFd, &buffer, 1);
-			
+		remove(argv[1]);
 	}
-	else			// decompress the file 
+// DECOMPRESSION ******************************************************************************************
+	if (!compress)			 
 	{
-		//TO DO: DECOMPRESSION CODE
-	}
+		unsigned int fileSize = 0; // to check that decompression was successful
+		unsigned int numBytesRead = 0;
+		unsigned char inputBuf; // for input using read() (See 'man 2 read')
+		unsigned int buffer = 0; // bit buffer that stores result until entire byte is ready for output
+		unsigned int numBits; // tracks bit position in input buffer
+		unsigned int bufSize = 0; //number of bits in buffer ready for output
+		unsigned int i; // iterator for for loops, etc
+		unsigned char notEOF = 1;
+		unsigned int readResult = 0;
 
+		// get fileSize for checking later
+		for (i = 0; i < 4; i++)
+		{
+			read(inputFd, &inputBuf, 1);
+			fileSize |= (0x000000FF & inputBuf) << (8 * i);
+		}
+		// assume the above works
+		
+	
+		//begin reading file
+		readResult = read(inputFd, &inputBuf, 1);
+		if (readResult < 1)
+		{
+			fprintf(stderr, "Error reading input file\n");
+			exit(1);
+		}
+		while(notEOF)
+		{
+			for (numBits = 0; numBits < 8; numBits++)
+			{
+				buffer |= (0x01 & (inputBuf >> numBits)) << bufSize;
+				bufSize++;
+
+				// check if output buffer is filled
+				// note that buffer is filled when size if 7 because MSB is 0 in .txt files
+				if (bufSize >= 7)
+				{
+					write(outputFd, &buffer, 1);
+					buffer = 0;
+					bufSize = 0;
+					numBytesRead++;
+				}
+			}
+
+			// get next byte
+			readResult = read(inputFd, &inputBuf, 1);
+			if (readResult < 0)
+			{
+				fprintf(stderr, "Error reading input file\n");
+				exit(1);
+			}
+			else if (readResult < 1) 
+			{
+				notEOF = 0;
+			}
+		}
+		
+		// deletes input file if decompression was successful
+		if (fileSize == numBytesRead) remove(argv[1]);
+		else 
+		{
+			fprintf(stderr, "Could not successfully decompress file.\n");
+			remove(outputFileName);
+			exit(1);
+		}
+	}
 	close(inputFd);
 	close(outputFd);
 	return 0;
