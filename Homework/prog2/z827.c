@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 
 int main (int argc, char *argv[])
@@ -52,7 +53,7 @@ int main (int argc, char *argv[])
 	}
 
 	// attempt to open output file
-	outputFd = open(outputFileName, O_CREAT, 0644);
+	outputFd = open(outputFileName, O_CREAT | O_WRONLY, 0644);
 	if (outputFd < 0)
 	{
 		perror("Error opening output file");
@@ -62,7 +63,73 @@ int main (int argc, char *argv[])
 	// begin compression or decompression
 	if (compress)	// compress the file
 	{
-		//TO DO: COMPRESSION CODE
+		unsigned int buffer = 0; // bit buffer
+		unsigned int numBits = 0; // number of bits in current byte
+		unsigned char *inputBuf; //input file for System read function
+		unsigned int bufSize = 0; // size of input buffer (to know when to dump to output file)
+		unsigned int i;	// iterator for for loops, etc
+		unsigned int readResult; // checks return value on read()
+		unsigned char notEOF = 1; // true when eof is reached
+
+		// get file size and print to file
+		struct stat fileStats;
+		stat(argv[1], &fileStats);
+		unsigned int fileSize = fileStats.st_size;
+		for (i = 0; i < 4; i++)
+		{
+			// print in little endian order
+			write(outputFd, &fileSize, 1);
+			printf("%x\n", fileSize);
+			fileSize = fileSize >> 8;		
+		}
+
+			readResult = read(inputFd, inputBuf, 1);	// get one character from input file to start
+			if (readResult < 0) 
+			{
+				fprintf(stderr, "Error reading file\n");
+				exit(1);
+			}
+			else if (readResult < 1)
+			{
+				notEOF = 0;
+			}
+		while (notEOF)
+		{
+			printf("%c\n", *inputBuf);
+			for (numBits = 0; numBits < 7; numBits++)
+			{
+				buffer |= (0x01 & (*inputBuf >> numBits)) << bufSize;
+				bufSize++;
+				if (bufSize >= 8)
+				{
+					// dump bit buffer when it is greater than or equal to 8 bits
+					write(outputFd, &buffer, 1);
+					bufSize = 0;
+					buffer = 0;
+				}
+			}
+			
+			// check last bit
+			if (!((0x01 << numBits) | *inputBuf))	// 1 in MSB, file cannot be compressed
+			{
+				fprintf(stderr, "File cannot be compressed.");
+				exit(1);
+			}
+			
+			readResult = read(inputFd, inputBuf, 1);
+			if (readResult < 0)
+			{
+				fprintf(stderr, "Error in file reading\n");
+				exit(1);
+			}
+			else if (readResult < 1)
+			{
+				notEOF = 0;
+			}
+		}
+		buffer = buffer << (8 - bufSize);
+		write(outputFd, &buffer, 1);
+			
 	}
 	else			// decompress the file 
 	{
@@ -70,5 +137,6 @@ int main (int argc, char *argv[])
 	}
 
 	close(inputFd);
+	close(outputFd);
 	return 0;
 }
