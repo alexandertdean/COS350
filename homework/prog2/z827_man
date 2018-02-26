@@ -1,0 +1,10 @@
+NAME
+	z827 - compress or expand files
+
+SYNOPSIS
+	z827 [name]
+
+DESCRIPTION
+	z827 reduces the size of the named file using Z827 coding. Whenever possible, each file is replaced by one with the extension .z827. Ownership modes are not necessarily preserved during this process. 
+
+	If the provided file has the .z827 extension, it is expanded to its original, decompressed state. Whenever possible, each file is replaced by one without the extension .z827. Ownership modes are not preserved during this process.

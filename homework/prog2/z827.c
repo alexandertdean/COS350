@@ -98,7 +98,6 @@ int main (int argc, char *argv[])
 		// compress rest of file
 		while (notEOF)
 		{
-//			printf("%c\n", *inputBuf);
 			for (numBits = 0; numBits < 7; numBits++)
 			{
 				buffer |= (0x01 & (inputBuf >> numBits)) << bufSize;
@@ -134,7 +133,8 @@ int main (int argc, char *argv[])
 		write(outputFd, &buffer, 1);
 		remove(argv[1]);
 	}
-// DECOMPRESSION ******************************************************************************************
+	
+	// DECOMPRESSION ******************************************************************************************
 	if (!compress)			 
 	{
 		unsigned int fileSize = 0; // to check that decompression was successful
