@@ -1,0 +1,47 @@
+Script started on Mon 26 Feb 2018 02:22:48 PM EST
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ cp short.txt short.orig
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ cp shake.txt shake.orig
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ z827 short.txt
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ z827 shake.txt
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ ls -l
+total 14396
+-rw-rw-r-- 1 atdean atdean 4676191 Feb 26 14:22 reference.shake.txt.z827
+-rw-rw-r-- 1 atdean atdean 5344213 Feb 26 14:23 shake.orig
+-rw-r--r-- 1 atdean atdean 4676191 Feb 26 14:23 shake.txt.z827
+-rw-rw-r-- 1 atdean atdean      67 Feb 26 14:22 short.orig
+-rw-r--r-- 1 atdean atdean      63 Feb 26 14:23 short.txt.z827
+-rw-rw-r-- 1 atdean atdean      63 Feb 26 14:22 short.txt.z827.referenceSoln
+-rw-rw-r-- 1 atdean atdean       0 Feb 26 14:22 typescript
+-rwxrwxr-x 1 atdean atdean   13456 Feb 26 14:22 [0m[01;32mz827[0m
+-rw-rw-r-- 1 atdean atdean    5160 Feb 26 14:22 z827.c
+-rw-rw-r-- 1 atdean atdean     508 Feb 26 14:22 z827_man
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ od -t x1 short.txt.z827
+0000000 43 00 00 00 41 d0 3c dd 86 b3 cb 20 7a 19 4f 07
+0000020 99 d3 ec 32 88 fe 06 89 cb a0 fa bc 4c 06 a5 dd
+0000040 20 7a 79 4e 4f bb cf a0 77 9d 0e a2 a3 cb 20 3d
+0000060 4e 76 03 8d df 6d b8 bc 3c 9f a7 df 6e 97 02
+0000077
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ z827.short.txt[K[K[K[K[K[K[K[K[K[K short.txt.z827
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ z827 shake.txt.z827
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ ls -l
+total 15048
+-rw-rw-r-- 1 atdean atdean 4676191 Feb 26 14:22 reference.shake.txt.z827
+-rw-rw-r-- 1 atdean atdean 5344213 Feb 26 14:23 shake.orig
+-rw-r--r-- 1 atdean atdean 5344213 Feb 26 14:23 shake.txt
+-rw-rw-r-- 1 atdean atdean      67 Feb 26 14:22 short.orig
+-rw-r--r-- 1 atdean atdean      67 Feb 26 14:23 short.txt
+-rw-rw-r-- 1 atdean atdean      63 Feb 26 14:22 short.txt.z827.referenceSoln
+-rw-rw-r-- 1 atdean atdean       0 Feb 26 14:22 typescript
+-rwxrwxr-x 1 atdean atdean   13456 Feb 26 14:22 [0m[01;32mz827[0m
+-rw-rw-r-- 1 atdean atdean    5160 Feb 26 14:22 z827.c
+-rw-rw-r-- 1 atdean atdean     508 Feb 26 14:22 z827_man
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ cmp short.txt short.orig
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ cmp shake.txt shake.orig
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ z827 badfilename
+Error opening file: No such file or directory
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ z827
+Usage: z827 filename
+]0;atdean@mosquito: ~/COS350/homework/prog2atdean@mosquito:~/COS350/homework/prog2$ exit
+exit
+
+Script done on Mon 26 Feb 2018 02:24:32 PM EST
