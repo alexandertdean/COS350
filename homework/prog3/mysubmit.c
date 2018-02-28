@@ -65,18 +65,22 @@ int main(int argc, char *argv[])
 		printf("Error creating assignment directory.");
 	}
 
-	// display files in current directory
-//	int result = scandir(".", &namelist, excludeHidden, alphasort);
-	printf("%10s %-6s %-5s %-25s", "SIZE", "DATE", "TIME", "NAME");
+	//print files that can be submitted
+	printf("The files in your current directory are:\n");
+	int result = scandir(".", &namelist, excludeHidden, alphasort);
+	printf("%10s %-6s %-5s %-25s\n", "SIZE", "DATE", "TIME", "NAME");
 	for (i = 0; i < result; i++) {
-		char tempDate[7];
-		char tempTime[6];
+		char tempDate[8];
+		char tempTime[8];
 
-//		stat(namelist[i]->d_name, &statStruct);
-		strftime(tempDate, 6, "%b %d", localtime(&(statStruct.st_ctime)));
-		printf("HERE");
-		printf("%10d %-6s %-5s %-25s", (int)statStruct.st_size, tempDate, "", "");
+		stat(namelist[i]->d_name, &statStruct);
+
+		strftime(tempDate, 7, "%b %d", localtime(&(statStruct.st_ctime)));
+		strftime(tempTime, 7, "%H:%M", localtime(&(statStruct.st_ctime)));
+		printf("%10d %-6s %-5s %-25s\n", (int)statStruct.st_size, tempDate, tempTime, namelist[i]->d_name);
 	}
+	printf("\nEnter the names of the files you wish to include in this submission.\n Separate names with spaces. You may also use wild cards such as *\nTo submit all files in the current direcotry, just enter *\n\nFiles: ");
+	
 
 	return 0;
 }
