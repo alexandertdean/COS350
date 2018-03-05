@@ -103,18 +103,18 @@ int main(int argc, char *argv[])
 	{
 		printf("%d < %d\n", j, i);
 		char *submitDir = strdup(courseName);
-		if (strcmp(files[j], "*") == 0)
-		{
+		//if (strcmp(files[j], "*") == 0)
+		//{
 			// copy all files (except hidden) to submit directory
-			break;
-		}
+		//	break;
+		//}
 		int k = 0;
 		for (k = 0; k < result; k++)
 		{
 			printf("%s vs. %s\n", files[j], namelist[k]->d_name);
 			if (strcmp(files[j], namelist[k]->d_name) == 0)
 			{
-				//implement CP
+				execl("/bin/cp", "/bin/cp", files[j], strcat(submitDir, "/"), (char*)NULL);
 			}
 		}
 	}
