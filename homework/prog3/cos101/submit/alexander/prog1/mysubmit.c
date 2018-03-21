@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
 		files[i] = malloc(80);
 		files[i] = strtok(NULL, " \n");
 		if (files[i] == NULL) break;
+		printf("%s\n", files[i]);
 	}
 
 	int j;
