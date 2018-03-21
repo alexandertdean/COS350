@@ -15,15 +15,19 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <pwd.h>
 
 int excludeHidden(const struct dirent *dire);
 void displayDir(struct dirent **namelist, int numEntries);
+int cp(char *source, char *dest);
 
 int main(int argc, char *argv[])
 {
 	
 	char *courseName = malloc(70);
 	char *assignmentName = malloc(40);
+	int numFiles;	//holds result of scandir
 
 	struct dirent **namelist = malloc(512);
 	struct stat statStruct;
@@ -47,14 +51,26 @@ int main(int argc, char *argv[])
 	}
 	printf("\n\nEnter the name of the programming assignment.\nUse ONE word only, no spaces or slashes. eg: prog1\nAssignment: ");
 	scanf("%s", assignmentName);
+
+	// check if username directory exists, create otherwise
+	char *username = getpwuid(getuid())->pw_name;
+	printf("%s\n", username);
+	if (stat(strcat(strcat(courseName, "/"), username), &statStruct) == 0)
+	{
+
+	}
+	else if (mkdir(courseName, 0777) < 0)
+	{
+		printf("Error creating user directory.\n");
+	}
 	
 	// check if assignment directory already exists
 	if (stat(strcat(strcat(courseName, "/"), assignmentName), &statStruct) == 0)
 	{	
 		char response[4];
 		printf("\nA previous submission with this assignment name exists.\nNew files will be added to that submission.\nYou may resubmit files, updating/replacing the old versions.\nExisting files which are not updated will not be affected.\nCurrent this submission contains:\n");
-		int result = scandir(courseName, &namelist, excludeHidden, alphasort);
-		displayDir(namelist, result);
+		numFiles = scandir(courseName, &namelist, excludeHidden, alphasort);
+		displayDir(namelist, numFiles);
 		printf("\nDo you wish to continue? (enter 'yes' or 'no')\nUpdate previous submission: ");
 		scanf("%s", response);
 		if (strcmp(response, "yes")) {
@@ -72,53 +88,66 @@ int main(int argc, char *argv[])
 	
 	//print files that can be submitted
 	printf("The files in your current directory are:\n");
-	int result = scandir(".", &namelist, excludeHidden, alphasort);
-	displayDir(namelist, result);
+	numFiles = scandir(".", &namelist, excludeHidden, alphasort);
+	displayDir(namelist, numFiles);
 	
 	// get user specifications of files to submit
 	getchar();
 	printf("\nEnter the names of the files you wish to include in this submission.\n Separate names with spaces. You may also use wild cards such as *\nTo submit all files in the current direcotry, just enter *\n\nFiles: ");
 
-	char *files[result];
-
+	char *files[numFiles];	//stores user-specified files (only should ever be numFiles entries)
 	char *fileLine = NULL;	// line of file names to submit
 	size_t nBytes = 0;			//size of line (there is probably a smarter way to do this)
-	i = 0;
 	getline(&fileLine, &nBytes, stdin); 	// gets next line of input
 	files[0] = malloc(80);
-	files[0] = strtok(fileLine, " ");
+	files[0] = strtok(fileLine, " \n");
 	
 	//get tokens first, then handle. Try array of strings, malloc each individually
-	while (1)
+	for (i = 1; i < numFiles; i++)
 	{
-		i++;
 		files[i] = malloc(80);
-		files[i] = strtok(NULL, " ");
+		files[i] = strtok(NULL, " \n");
 		if (files[i] == NULL) break;
 	}
 
-	printf("%d\n", i);
 	int j;
 	for (j = 0; j < i; j++)
 	{
-		printf("%d < %d\n", j, i);
-		char *submitDir = strdup(courseName);
+		// if * is entered, copy all files (not directories) in working directory
 		if (strcmp(files[j], "*") == 0)
 		{
-			// copy all files (except hidden) to submit directory
-			break;
+			for (i = 0; i < numFiles; i++)
+			{
+				stat(namelist[i]->d_name, &statStruct);
+				if (S_ISREG(statStruct.st_mode)) cp(namelist[i]->d_name, courseName);
+			}
+			break;	// because no other value after this matters (all files have been copied anyway)
 		}
+
+		// iterate through each user specified file and ensure it's in the entry
 		int k = 0;
-		for (k = 0; k < result; k++)
+		int matchFound = 0;
+		for (k = 0; k < numFiles; k++)
 		{
-			printf("%s vs. %s\n", files[j], namelist[k]->d_name);
 			if (strcmp(files[j], namelist[k]->d_name) == 0)
 			{
-				//implement CP
+				// only copy if not directory
+				stat(files[j], &statStruct);
+				if (S_ISREG(statStruct.st_mode))	cp(files[j], courseName);
+				else fprintf(stderr, "%s - SKIPPING: mysubmit does not copy directories\n", files[j]);
+				matchFound = 1;
+				break;
 			}
 		}
+		if (!matchFound) fprintf(stderr, "problem matching: %s\n", files[j]);
 	}
 
+	//submission complete, print files in submission
+	printf("\nSubmission completed. These are the files in this submission:\n");
+	numFiles = scandir(courseName, &namelist, excludeHidden, alphasort);
+	displayDir(namelist, numFiles);
+
+	//return zero because I'm a good little C program
 	return 0;
 }
 
@@ -144,4 +173,24 @@ void displayDir(struct dirent **namelist, int numEntries)
 		strftime(tempTime, 7, "%H:%M", localtime(&(statStruct.st_ctime)));
 		printf("%10d %-6s %-5s %-25s\n", (int)statStruct.st_size, tempDate, tempTime, namelist[i]->d_name);
 	}
+}
+
+int cp(char *source, char *dest)
+{
+	// allocate a string that can hold the full file name
+	char *destFileName = malloc(strlen(source) + strlen(dest) + 1);
+	strcpy(destFileName, dest);		//copy destination directory name into destination file name
+
+	int sourceFd = open(source, O_RDONLY);
+	struct stat statStruct;
+	stat(source, &statStruct);
+	
+	// allocate buffer for size of file (getting it all in one read() because it's 2018 and we have memory)
+	char *buffer = malloc(statStruct.st_size);
+
+	//open destination file
+	int destFd = open(strcat(strcat(destFileName, "/"), source), O_CREAT | O_RDWR, statStruct.st_mode);
+	read(sourceFd, buffer, statStruct.st_size);
+	write(destFd, buffer, statStruct.st_size);
+	return 0;
 }
