@@ -30,27 +30,62 @@ int main (int argc, char* argv[])
 	struct termios termConfig, termConfig_orig;	// struct for holding terminal configuration information, and original configuration
 	int i; // everyone's favorite for loop variable
 	char input;	// character inputted by user for control
+	char *key = malloc (999902);
 	int bool_timerOn = 0; // boolean to determine if timer is currently running
+	int keyboardFd;
 
 	// check for correct number of arguments
-	if (argc != 2)
+	if (argc > 2)
 	{
 		fprintf(stderr, "Usage: scroll [file]\n");
 		exit(1);
 	}
-	
-	// open source file
-	fp = fopen(argv[1], "r");
-	if (fp == NULL)
+	else if (argc == 2)
 	{
-		fprintf(stderr, "Error opening file %s\n", argv[1]);
-		exit(1);
+		// open source file
+		fp = fopen(argv[1], "r");
+		if (fp == NULL)
+		{
+			fprintf(stderr, "Error opening file %s\n", argv[1]);
+			exit(1);
+		}
+	}
+	else 
+	{
+		fp = stdin;
+		keyboardFd = open("/dev/tty", O_RDWR);
+		if (keyboardFd < 0) 
+		{
+			perror("Unable to open keyboard device:");
+			exit(1);
+		}
 	}
 
 	// get terminal size information
 	if (ioctl(1, TIOCGWINSZ, &termSize) < 0)
 	{
 		printf("Unable to get terminal window size: %s\n", strerror(errno));
+		exit(1);
+	}
+
+	// turn echo and canonical stuff off
+	if (tcgetattr(STDOUT_FILENO, &termConfig) < 0)	// get current terminal configuration
+	{
+		printf("Unable to get terminal settings(0): %s\n", strerror(errno));
+		exit(1);
+	}
+	if (tcgetattr(STDOUT_FILENO, &termConfig_orig) < 0) // get current terminal configuration (again)
+	{
+		printf("Unable to get terminal settings(1): %s\n", strerror(errno));
+		exit(1);
+	}
+
+	termConfig.c_lflag &= ~ECHO;	// disable echoing
+	termConfig.c_lflag &= ~ICANON;  // disable canonical mode
+	
+	if (tcsetattr(STDOUT_FILENO, TCSANOW, &termConfig) < 0)	// set terminal settings to changed settings
+	{
+		printf("Unable to set terminal settings: %s\n", strerror(errno));
 		exit(1);
 	}
 
@@ -94,38 +129,27 @@ int main (int argc, char* argv[])
 	}	
 	lines_allocated = i;
 	
-
-	// turn echo and canonical stuff off
-	if (tcgetattr(0, &termConfig) < 0)	// get current terminal configuration
-	{
-		printf("Unable to get terminal settings(0): %s\n", strerror(errno));
-		exit(1);
-	}
-	if (tcgetattr(0, &termConfig_orig) < 0) // get current terminal configuration (again)
-	{
-		printf("Unable to get terminal settings(1): %s\n", strerror(errno));
-		exit(1);
-	}
-
-	termConfig.c_lflag &= ~ECHO;	// disable echoing
-	termConfig.c_lflag &= ~ICANON;  // disable canonical mode
-	
-	if (tcsetattr(0, TCSANOW, &termConfig) < 0)	// set terminal settings to changed settings
-	{
-		printf("Unable to set terminal settings: %s\n", strerror(errno));
-		exit(1);
-	}
-	
 	signal(SIGINT, SIG_IGN); // from now on, ignore interrupt (Ctrl + C), program will be exitted type typing q
-	
+
 	// start by displaying a screenful of the input file
-	system("clear");
-	fflush(stdout);
-	system("clear");
 	displayScreenful(lines, &currentLine, termSize);
-	printf("\033[7m%s", argv[1]);
-	input = getchar();
-	for (i = 0; i < strlen(argv[1]); i++) printf("\b");
+	if (argc == 2) {
+		printf("\033[7m%s", argv[1]);
+	}
+	else
+	{
+		printf("\033[7mstdin");
+	}
+	if (argc == 2)
+		input = getchar();
+	else
+	{	
+		while (read(keyboardFd, key, 1) < 1);
+		input = *key;
+	}
+	if (argc == 2)
+		for (i = 0; i < strlen(argv[1]); i++) printf("\b");
+	else for (i = 0; i < 6; i++) printf("\b");
 	printf("\033[0m");
 	printf("\033[0J");
 	while (input != 'q')
@@ -177,13 +201,21 @@ int main (int argc, char* argv[])
 			printf("\033[2K\033[%d;0H", termSize.ws_row);
 			printf("\033[7mScrolling 1 line per %3.2f second(s) \033[0m", ((double)timerInterval / 1000000));
 		}
-		input = getchar();
+		if (argc == 2)
+		{
+			input = getchar();
+		}
+		else
+		{
+			while (read(keyboardFd, key, 1) < 1);
+			input = *key;
+		}
 		printf("\033[0J");
 	}
 	printf("\n");
 	
 	// put terminal settings back to original so the user isn't confused why they can't type anything
-	tcsetattr(0, TCSANOW, &termConfig_orig);
+	tcsetattr(STDOUT_FILENO, TCSANOW, &termConfig_orig);
 
 	// clean up memory
 	for (i = 0; i < lines_allocated; i++) free(lines[i]);
