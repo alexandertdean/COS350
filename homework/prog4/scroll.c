@@ -135,29 +135,48 @@ int main (int argc, char* argv[])
 			displayScreenful(lines, &currentLine, termSize);
 			printf(":");
 		}
-		else if (input == '\n' && !bool_timerOn)
+		else if (input == '\n')
 		{
-			timer.it_interval.tv_usec = 1000;
-			timer.it_interval.tv_sec = 0;
-			timer.it_value.tv_usec = 2;
-			timer.it_value.tv_sec = 0;
+			if (!bool_timerOn)
+			{
+				// configure timer settings for 1 ms
+				timer.it_interval.tv_usec = 1000;
+				timer.it_interval.tv_sec = 0;
+				timer.it_value.tv_usec = 2;
+				timer.it_value.tv_sec = 0;
+	
+				// set interval timer to call handler()
+				signal(SIGALRM, handler);
 
-			signal(SIGALRM, handler);
-
-			bool_timerOn = 1;
-			setitimer(ITIMER_REAL, &timer, NULL);
-			printf("\033[7mScrolling 1 line per %3.2f seconds(s) \033[0m", ((double)timerInterval /1000000));
+				bool_timerOn = 1;
+				setitimer(ITIMER_REAL, &timer, NULL);
+				printf("\033[7mScrolling 1 line per %3.2f seconds(s) \033[0m", ((double)timerInterval / 1000000));
+			}
+			else
+			{
+				// disable timer
+				timer.it_interval.tv_usec = 0;
+				timer.it_value.tv_usec = 0;
+				setitimer(ITIMER_REAL, &timer, NULL);
+				bool_timerOn = 0;
+				timerTime = 0;
+				printf("\033[2K\033[%d;0H:", termSize.ws_row);
+			}
 		}
 		else if (input == 'f' && bool_timerOn)
 		{
+			// decrease timer interval
 			timerInterval *= 0.8;
 			printf("\033[2K\033[%d;0H", termSize.ws_row);
+			printf("\033[7mScrolling 1 line per %3.2f second(s) \033[0m", ((double)timerInterval / 1000000));
 		}
 		else if (input == 's' && bool_timerOn)
 		{
+			// increase timer interval
 			timerInterval *= 1.2;
+			printf("\033[2K\033[%d;0H", termSize.ws_row);
+			printf("\033[7mScrolling 1 line per %3.2f second(s) \033[0m", ((double)timerInterval / 1000000));
 		}
-		else printf(":");
 		input = getchar();
 		printf("\033[0J");
 	}
@@ -165,6 +184,8 @@ int main (int argc, char* argv[])
 	
 	// put terminal settings back to original so the user isn't confused why they can't type anything
 	tcsetattr(0, TCSANOW, &termConfig_orig);
+
+	// clean up memory
 	for (i = 0; i < lines_allocated; i++) free(lines[i]);
 	free(lines);
 	return 0;	//	returns 0 like a good little C program
@@ -189,12 +210,8 @@ static void handler()
 	{
 		currentLine -= (termSize.ws_row - 2);
 		displayScreenful();
-		printf("\033[0J \033[07mScrolling 1 line per %3.2f second(s) \033[0m", (((double)timerInterval / 1000) / 1000));
+		printf("\033[0J\033[07mScrolling 1 line per %3.2f second(s) \033[0m", (((double)timerInterval / 1000) / 1000));
 		timerTime = 0;
 	}
 	fflush(stdout);
 }
-
-
-
-
