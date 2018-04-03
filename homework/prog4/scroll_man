@@ -1,0 +1,18 @@
+NAME
+	scroll - file display tool for manual or automatic viewing
+
+SYNOPSIS
+	scroll [file]
+
+DESCRIPTION
+	scroll is a filter for paging through text one screenful at a time, or automatically scrolling through the text one line 
+	at a time
+
+Usage
+	Key Inputs:
+
+	space - display the next screenful of text
+	enter/return - begin automatically scrolling
+		       default speed is 1 line per 2 seconds
+	'f' - while automatically scrolling, increases speed at which lines are displayed
+	's' - while automatically scrolling, decreases speed at which lines are displayed	

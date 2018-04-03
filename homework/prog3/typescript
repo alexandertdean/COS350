@@ -1,0 +1,114 @@
+Script started on Tue 20 Mar 2018 11:44:23 PM EDT
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mkdir cos101
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mkdir cos101/submit
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mysubmit
+Enter the name of the computer science course. eg: cos350
+Course: cos101
+
+
+Enter the name of the programming assignment.
+Use ONE word only, no spaces or slashes. eg: prog1
+Assignment: prog1
+atdean
+40775
+The files in your current directory are:
+      SIZE DATE   TIME  NAME                     
+       187 Mar 17 07:41 Makefile                 
+      4096 Mar 20 23:44 cos101                   
+     18288 Mar 20 23:43 mysubmit                 
+      6474 Mar 20 23:43 mysubmit.c               
+         0 Mar 20 23:44 typescript               
+
+Enter the names of the files you wish to include in this submission.
+ Separate names with spaces. You may also use wild cards such as *
+To submit all files in the current direcotry, just enter *
+
+Files: mysubmit.c myus  submit Makefile
+mysubmit
+Makefile
+
+Submission completed. These are the files in this submission:
+      SIZE DATE   TIME  NAME                     
+       187 Mar 17 07:41 Makefile                 
+     18288 Mar 20 23:43 mysubmit                 
+      6474 Mar 20 23:43 mysubmit.c               
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ ls -lR cos101
+cos101:
+total 4
+drwxrwxr-x 3 atdean atdean 4096 Mar 20 23:44 [0m[01;34msubmit[0m
+
+cos101/submit:
+total 4
+drwxrwxr-x 3 atdean atdean 4096 Mar 20 23:44 [01;34matdean[0m
+
+cos101/submit/atdean:
+total 4
+drwxrwxr-x 2 atdean atdean 4096 Mar 20 23:45 [01;34mprog1[0m
+
+cos101/submit/atdean/prog1:
+total 32
+-rw-rw-r-- 1 atdean atdean   187 Mar 20 23:45 Makefile
+-rwxrwxr-x 1 atdean atdean 18288 Mar 20 23:45 [01;32mmysubmit[0m
+-rw-rw-r-- 1 atdean atdean  6474 Mar 20 23:45 mysubmit.c
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mkdir cos102
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mkdir cos102/submit
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mysubmit
+Enter the name of the computer science course. eg: cos350
+Course: cos102
+
+
+Enter the name of the programming assignment.
+Use ONE word only, no spaces or slashes. eg: prog1
+Assignment: prog1
+atdean
+40775
+The files in your current directory are:
+      SIZE DATE   TIME  NAME                     
+       187 Mar 17 07:41 Makefile                 
+      4096 Mar 20 23:44 cos101                   
+      4096 Mar 20 23:45 cos102                   
+     18288 Mar 20 23:43 mysubmit                 
+      6474 Mar 20 23:43 mysubmit.c               
+         0 Mar 20 23:44 typescript               
+
+Enter the names of the files you wish to include in this submission.
+ Separate names with spaces. You may also use wild cards such as *
+To submit all files in the current direcotry, just enter *
+
+Files: *
+
+Submission completed. These are the files in this submission:
+      SIZE DATE   TIME  NAME                     
+       187 Mar 17 07:41 Makefile                 
+     18288 Mar 20 23:43 mysubmit                 
+      6474 Mar 20 23:43 mysubmit.c               
+         0 Mar 20 23:44 typescript               
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ ls -lR cos102
+cos102:
+total 4
+drwxrwxr-x 3 atdean atdean 4096 Mar 20 23:45 [0m[01;34msubmit[0m
+
+cos102/submit:
+total 4
+drwxrwxr-x 3 atdean atdean 4096 Mar 20 23:45 [01;34matdean[0m
+
+cos102/submit/atdean:
+total 4
+drwxrwxr-x 2 atdean atdean 4096 Mar 20 23:45 [01;34mprog1[0m
+
+cos102/submit/atdean/prog1:
+total 32
+-rw-rw-r-- 1 atdean atdean   187 Mar 20 23:45 Makefile
+-rwxrwxr-x 1 atdean atdean 18288 Mar 20 23:45 [01;32mmysubmit[0m
+-rw-rw-r-- 1 atdean atdean  6474 Mar 20 23:45 mysubmit.c
+-rw-rw-r-- 1 atdean atdean     0 Mar 20 23:45 typescript
+]0;atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ mysubmit
+Enter the name of the computer science course. eg: cos350
+Course: cos103
+cos103: No such file or directory
+input validation failed, try again
+Course:
+atdean@earwig: ~/COS350/homework/prog3atdean@earwig:~/COS350/homework/prog3$ exit
+exit
+
+Script done on Tue 20 Mar 2018 11:47:25 PM EDT
