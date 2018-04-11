@@ -12,11 +12,12 @@ int main()
 		pid = fork();
 		if (pid == 0)
 		{
-			printf("%d\n", i);
+			printf("%d %d\n", i + 1, getpid());
 			break;
 		}
+		if (pid != 0) wait(NULL);
 	}
-	if (pid != 0) wait();
+	if (pid != 0) printf("5 %d\n", getpid());
 	return 0;
 	
 }
