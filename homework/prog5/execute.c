@@ -16,13 +16,17 @@ int execute(char *argv[])
 {
 	int	pid ;
 	int	child_info = -1;
+	int lastIndex = 0;
+	int bool_runInBackground = 0;
 
 	if ( argv[0] == NULL )		/* nothing succeeds	*/
 	return 0;
 	if (strcmp(argv[0], "exit") == 0)
 	{
-		printf("Exitted with value %d\n", atoi(argv[1]));
-		exit(atoi(argv[1]));
+		int exitVal;
+		if (argv[1] == NULL) exitVal = 0;
+		else exitVal = atoi(argv[1]);
+		exit(exitVal);
 	}
 	else if (strcmp(argv[0], "cd") == 0)
 	{
@@ -36,10 +40,27 @@ int execute(char *argv[])
 		}
 		return 0;
 	}
+	
+	int i = 0;
+	while (1)
+	{
+		if (argv[i] == NULL)
+		{
+		 	lastIndex = i - 1;
+			break;
+		}
+		i++;
+	}
 
-	if ( (pid = fork())  == -1 )
+	if (strcmp(argv[lastIndex], "&") == 0)
+	{
+		bool_runInBackground = 1;
+		argv[lastIndex] = NULL;
+	}	
+	
+	if ( (pid = fork())  == -1 )					// FORK ERROR
 		perror("fork");
-	else if ( pid == 0 )
+	else if ( pid == 0 )							// CHILD PROCESS
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
@@ -47,10 +68,17 @@ int execute(char *argv[])
 		perror("cannot execute command");
 		exit(1);
 	}
-	else 
+	else 											// PARENT PROCESS
 	{
-		if ( wait(&child_info) == -1 )
-			perror("wait");
+		if (!bool_runInBackground)
+		{
+			int npid = waitpid(-1, &child_info, 0);
+			while (npid != pid)
+			{
+				printf("Done : %d\n", npid);
+				npid = waitpid(-1, &child_info, 0);
+			}
+		}
 	}
 	return child_info;
 }

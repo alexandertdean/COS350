@@ -8,17 +8,20 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
+#include <string.h>
 #include "smsh.h"
 
 #define	DFL_PROMPT	"> "
 
 int main()
 {
-	char	*cmdline, *prompt, **arglist;
+	char	*cmdline, **arglist;
 	int	result;
 	void	setup();
-
-	prompt = DFL_PROMPT ;
+	char *prompt = malloc(1024);
+	char *cwd = malloc(1022);
+	cwd = getcwd(cwd, 1022);
+	sprintf(prompt, "\033[32m%s: \033[0m", cwd);
 	setup();
 
 	while ( (cmdline = next_cmd(prompt, stdin)) != NULL ){
@@ -27,6 +30,8 @@ int main()
 			freelist(arglist);
 		}
 		free(cmdline);
+		cwd = getcwd(cwd, 1022);
+		sprintf(prompt, "\033[32m%s: \033[0m", cwd);
 	}
 	return 0;
 }
